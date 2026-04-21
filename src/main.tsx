@@ -15,21 +15,24 @@ import { convex } from '@/lib/convex';
 import '@/index.css'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { HomePage } from '@/pages/HomePage'
+import { DashboardPage } from '@/pages/DashboardPage'
+import { TransactionsPage } from '@/pages/TransactionsPage'
+import { InsightsPage } from '@/pages/InsightsPage'
 import { AiChatPage } from '@/pages/AiChatPage'
-
 const queryClient = new QueryClient();
-
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
     errorElement: <RouteErrorBoundary />,
     children: [
       { path: "/", element: <HomePage /> },
+      { path: "/dashboard", element: <DashboardPage /> },
+      { path: "/transactions", element: <TransactionsPage /> },
+      { path: "/insights", element: <InsightsPage /> },
       { path: "/ai-chat", element: <AiChatPage /> },
     ],
   },
 ]);
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
