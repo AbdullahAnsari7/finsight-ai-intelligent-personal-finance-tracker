@@ -20,6 +20,7 @@ import { TransactionsPage } from '@/pages/TransactionsPage'
 import { BudgetsPage } from '@/pages/BudgetsPage'
 import { InsightsPage } from '@/pages/InsightsPage'
 import { AiChatPage } from '@/pages/AiChatPage'
+import { SettingsPage } from '@/pages/SettingsPage'
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
       { path: "/budgets", element: <BudgetsPage /> },
       { path: "/insights", element: <InsightsPage /> },
       { path: "/ai-chat", element: <AiChatPage /> },
+      { path: "/settings", element: <SettingsPage /> },
     ],
   },
 ]);
