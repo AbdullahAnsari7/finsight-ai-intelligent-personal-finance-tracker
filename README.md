@@ -1,6 +1,6 @@
 # AI Chat
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AbdullahAnsari7/finsight-ai-intelligent-personal-finance-tracker)
 
 A full-stack AI chat application built with **Cloudflare Workers**, **Convex** (serverless backend), and **React**. Users can create persistent chat threads, customize AI system prompts, and converse with powerful models via **OpenRouter** integration. Features secure authentication, real-time messaging, and a modern responsive UI.
 
@@ -95,7 +95,7 @@ Or step-by-step:
 2. Deploy backend: `bun run backend:deploy` (update VITE_CONVEX_URL if new Convex project)
 3. Deploy worker: `wrangler deploy`
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/AbdullahAnsari7/finsight-ai-intelligent-personal-finance-tracker)
 
 **Custom Domain**: Edit `wrangler.jsonc`, run `wrangler deploy`.
 
