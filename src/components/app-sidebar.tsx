@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, LayoutDashboard, ListOrdered, Sparkles, MessageSquare } from "lucide-react";
+import { Home, LayoutDashboard, ListOrdered, Sparkles, MessageSquare, PiggyBank } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -15,6 +15,7 @@ const navItems = [
   { label: "Home", path: "/", icon: Home },
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { label: "Transactions", path: "/transactions", icon: ListOrdered },
+  { label: "Budgets", path: "/budgets", icon: PiggyBank },
   { label: "AI Advisor", path: "/insights", icon: Sparkles },
   { label: "Chat Support", path: "/ai-chat", icon: MessageSquare },
 ];

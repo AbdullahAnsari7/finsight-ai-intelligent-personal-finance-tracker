@@ -17,6 +17,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { HomePage } from '@/pages/HomePage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { TransactionsPage } from '@/pages/TransactionsPage'
+import { BudgetsPage } from '@/pages/BudgetsPage'
 import { InsightsPage } from '@/pages/InsightsPage'
 import { AiChatPage } from '@/pages/AiChatPage'
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
       { path: "/", element: <HomePage /> },
       { path: "/dashboard", element: <DashboardPage /> },
       { path: "/transactions", element: <TransactionsPage /> },
+      { path: "/budgets", element: <BudgetsPage /> },
       { path: "/insights", element: <InsightsPage /> },
       { path: "/ai-chat", element: <AiChatPage /> },
     ],

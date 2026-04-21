@@ -1,7 +1,7 @@
 import { Authenticated, useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { format } from "date-fns";
-import { Plus, Trash2, Search, Filter } from "lucide-react";
+import { Plus, Trash2, Search, Download } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -27,10 +27,15 @@ export function TransactionsPage() {
   const removeTransaction = useMutation(api.transactions.remove);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const filtered = transactions?.filter(t => 
-    t.category.toLowerCase().includes(search.toLowerCase()) || 
-    t.description?.toLowerCase().includes(search.toLowerCase())
-  );
+  const [filterMonth, setFilterMonth] = useState<string>(new Date().toISOString().slice(0, 7));
+
+  const filtered = transactions?.filter(t => {
+    const matchesSearch = t.category.toLowerCase().includes(search.toLowerCase()) ||
+      t.description?.toLowerCase().includes(search.toLowerCase());
+    const txMonth = new Date(t.date).toISOString().slice(0, 7);
+    return matchesSearch && txMonth === filterMonth;
+  });
+
   const handleDelete = async (id: any) => {
     try {
       await removeTransaction({ id });
@@ -39,6 +44,29 @@ export function TransactionsPage() {
       toast.error("Failed to delete");
     }
   };
+
+  const exportCSV = () => {
+    if (!filtered || filtered.length === 0) return;
+    const headers = ["Date", "Type", "Category", "Amount", "Description"];
+    const rows = filtered.map(t => [
+      format(t.date, 'yyyy-MM-dd'),
+      t.type,
+      t.category,
+      t.amount,
+      t.description || ""
+    ]);
+    const content = [headers, ...rows].map(e => e.join(",")).join("\n");
+    const blob = new Blob([content], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `transactions_${filterMonth}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   return (
     <Authenticated>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,6 +77,15 @@ export function TransactionsPage() {
               <p className="text-muted-foreground">Manage your history and log new activity.</p>
             </div>
             <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Input 
+                  type="month" 
+                  value={filterMonth} 
+                  onChange={(e) => setFilterMonth(e.target.value)}
+                  className="rounded-xl bg-secondary/50 border-none w-40"
+                />
+                <Button variant="outline" size="icon" onClick={exportCSV} className="rounded-xl"><Download className="w-4 h-4" /></Button>
+              </div>
               <div className="relative w-full md:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input 

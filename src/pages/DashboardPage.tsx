@@ -1,7 +1,7 @@
 import { Authenticated, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as RechartsTooltip } from "recharts";
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as RechartsTooltip, AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Wallet, TrendingUp, TrendingDown, Clock, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
@@ -9,11 +9,33 @@ import { motion } from "framer-motion";
 const COLORS = ['#10b981', '#6366f1', '#f59e0b', '#ec4899', '#8b5cf6'];
 export function DashboardPage() {
   const stats = useQuery(api.transactions.getStats);
-  if (stats === undefined) return <div className="p-12 text-center text-muted-foreground">Loading financial data...</div>;
+  const currentPeriod = new Date().toISOString().slice(0, 7);
+  const budgetStatus = useQuery(api.budgets.getBudgetStatus, { period: currentPeriod });
+
+  if (stats === undefined) {
+    return (
+      <div className="h-screen center flex-col gap-4 animate-pulse">
+        <div className="h-12 w-12 rounded-xl bg-emerald-500/20 border border-emerald-500/20" />
+        <p className="text-muted-foreground font-medium">Syncing with ledger...</p>
+      </div>
+    );
+  }
+
+  // Prepare trend data for AreaChart
+  const trendData = stats?.recentTransactions ? [...stats.recentTransactions].reverse().reduce((acc: any[], curr) => {
+    const lastVal = acc.length > 0 ? acc[acc.length - 1].balance : 0;
+    const newVal = curr.type === 'income' ? lastVal + curr.amount : lastVal - curr.amount;
+    acc.push({
+      date: format(curr.date, 'MM/dd'),
+      balance: newVal,
+    });
+    return acc;
+  }, []) : [];
+
   const cards = [
-    { label: "Total Balance", value: stats?.totalBalance ?? 0, icon: Wallet, color: "text-slate-900 dark:text-white" },
-    { label: "Income", value: stats?.totalIncome ?? 0, icon: TrendingUp, color: "text-finance-success" },
-    { label: "Expenses", value: stats?.totalExpenses ?? 0, icon: TrendingDown, color: "text-finance-expense" },
+    { label: "Total Balance", value: stats?.totalBalance ?? 0, icon: Wallet, color: "text-slate-900 dark:text-white", bg: "bg-slate-900/5 dark:bg-white/5" },
+    { label: "Income", value: stats?.totalIncome ?? 0, icon: TrendingUp, color: "text-finance-success", bg: "bg-emerald-500/5" },
+    { label: "Expenses", value: stats?.totalExpenses ?? 0, icon: TrendingDown, color: "text-finance-expense", bg: "bg-rose-500/5" },
   ];
   return (
     <Authenticated>
@@ -36,16 +58,16 @@ export function DashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="border-none shadow-soft overflow-hidden group">
-                  <CardContent className="p-6 relative">
+                <Card className={`border-none shadow-soft overflow-hidden group ${card.bg}`}>
+                  <CardContent className="p-6">
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
                         <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{card.label}</p>
                         <h3 className={`text-3xl font-display font-bold ${card.color}`}>
-                          ${card.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          ${card.value.toLocaleString(undefined, { minimumFractionDigits: 0 })}
                         </h3>
                       </div>
-                      <div className="h-12 w-12 rounded-xl bg-slate-50 dark:bg-slate-900 center shadow-sm group-hover:scale-110 transition-transform">
+                      <div className="h-12 w-12 rounded-xl bg-white dark:bg-slate-900 center shadow-sm group-hover:scale-110 transition-transform">
                         <card.icon className={`w-6 h-6 ${card.color}`} />
                       </div>
                     </div>
@@ -54,6 +76,38 @@ export function DashboardPage() {
               </motion.div>
             ))}
           </div>
+
+          <Card className="border-none shadow-soft bg-white dark:bg-slate-900 overflow-hidden">
+            <CardHeader>
+              <CardTitle className="text-lg">Balance Trend</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="h-[300px] w-full pr-4">
+                {trendData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={trendData}>
+                      <defs>
+                        <linearGradient id="colorBal" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} />
+                      <YAxis hide />
+                      <RechartsTooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                      <Area type="monotone" dataKey="balance" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorBal)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full center text-muted-foreground text-sm">
+                    Insufficient transaction history for trends
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <Card className="lg:col-span-1 border-none shadow-soft">
               <CardHeader>

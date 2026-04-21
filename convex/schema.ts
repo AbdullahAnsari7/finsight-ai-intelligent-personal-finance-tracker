@@ -23,6 +23,15 @@ const applicationTables = {
   })
     .index("by_userId", ["userId"])
     .index("by_userId_date", ["userId", "date"]),
+  budgets: defineTable({
+    userId: v.id("users"),
+    category: v.string(),
+    amount: v.number(),
+    period: v.string(), // Format: YYYY-MM
+  })
+    .index("by_userId", ["userId"])
+    .index("by_userId_period", ["userId", "period"])
+    .index("by_userId_category_period", ["userId", "category", "period"]),
   chatThreads: defineTable({
     userId: v.id("users"),
     title: v.string(),
