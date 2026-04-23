@@ -3,16 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+
   "scripts": {
-    "dev": "convex dev --once && vite --host 0.0.0.0 --port ${PORT:-3000}",
-    "build": "bun run backend:deploy && vite build",
-    "lint": "convex dev --once && eslint --cache -f json --quiet .",
-    "preview": "bun run build && vite preview --host 0.0.0.0 --port ${PORT:-4173}",
-    "deploy": "bun run build && wrangler deploy",
-    "cf-typegen": "wrangler types",
-    "backend:deploy": "convex dev --once && convex deploy -y",
-    "prepare": "bun .bootstrap.js || true"
+    "dev": "convex dev --once && vite --host 0.0.0.0 --port 5173",
+    "backend:deploy": "convex deploy -y",
+    "build": "vite build"
   },
+
   "dependencies": {
     "@convex-dev/auth": "^0.0.90",
     "@convex-dev/eslint-plugin": "^1.1.1",
